@@ -1,0 +1,21 @@
+{
+  "version": "iwsdk.scene.v1",
+  "units": "meters",
+  "components": {
+    "com.iwsdk.components.DomeGradient": {
+      "sky": [0.16, 0.2, 0.32, 1],
+      "equator": [0.42, 0.44, 0.52, 1],
+      "ground": [0.2, 0.2, 0.22, 1],
+      "intensity": 1
+    },
+    "com.iwsdk.components.IBLGradient": {
+      "sky": [0.7, 0.75, 0.9, 1],
+      "equator": [0.75, 0.7, 0.65, 1],
+      "ground": [0.35, 0.33, 0.3, 1],
+      "intensity": 0.9
+    }
+  },
+  "resources": {},
+  "nodes": [],
+  "authoring": { "views": [] }
+}

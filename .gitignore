@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.local
+.DS_Store
+*.log
+.iwsdk/
+.tmp/
+.mcp.json
+# Copied from node_modules by scripts/copy-mediapipe.mjs
+public/mediapipe/
+.tmp-*

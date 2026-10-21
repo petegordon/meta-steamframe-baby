@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖐️</text></svg>" />
+    <title>Camera Hands</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #1b1d24; color: #eee; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+      #scene-container canvas { display: block; touch-action: none; }
+      .hud { position: fixed; top: 12px; left: 12px; width: min(360px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow-y: auto; box-sizing: border-box; background: rgba(20, 22, 30, .88); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; backdrop-filter: blur(6px); }
+      .hud[hidden] { display: none; }
+      .hud h1 { margin: 0; font-size: 20px; }
+      .hud header p { margin: 4px 0 0; font-size: 12px; opacity: .7; line-height: 1.4; }
+      .hud .row { display: flex; gap: 8px; }
+      .hud button { flex: 1; font: inherit; font-weight: 700; border: 0; border-radius: 10px; padding: 10px; cursor: pointer; background: #3a3f50; color: #fff; }
+      .hud button.vr { background: #4d7cff; }
+      .hud .status { font-size: 12px; opacity: .8; min-height: 1.2em; }
+      .hud .preview canvas { width: 100%; border-radius: 8px; display: block; }
+      .hud label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; opacity: .9; }
+      .hud label.check { flex-direction: row; align-items: center; gap: 8px; }
+      .hud select { font: inherit; padding: 6px; border-radius: 8px; background: #2a2e3a; color: #eee; border: 1px solid #444; }
+      .hud details summary { cursor: pointer; font-size: 13px; font-weight: 600; }
+      .hud .sliders { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+      .hud label.slider { display: grid; grid-template-columns: 96px 1fr 48px; align-items: center; gap: 6px; }
+      .hud output { text-align: right; font-variant-numeric: tabular-nums; }
+    </style>
+  </head>
+  <body>
+    <div id="scene-container"></div>
+    <script type="module" src="/src/index.ts"></script>
+  </body>
+</html>
