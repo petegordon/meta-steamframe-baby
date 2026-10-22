@@ -61,6 +61,7 @@ export class DemoSystem extends createSystem({
         s.state === 'running' || s.state === 'starting',
       );
 
+    void this.checkXRSupport();
     this.buildScene();
     for (const s of Object.values(this.skel)) world.createTransformEntity(s.root, { persistent: true });
     world.createTransformEntity(this.preview.panel, { persistent: true });
@@ -105,11 +106,52 @@ export class DemoSystem extends createSystem({
     });
   }
 
+  /** Tell the HUD whether this browser can enter VR at all. */
+  private async checkXRSupport(): Promise<void> {
+    const xr = navigator.xr;
+    if (!xr) {
+      this.hud.setVr(false, window.isSecureContext ? 'No WebXR in this browser' : 'VR needs https://');
+      return;
+    }
+    try {
+      const ok = await xr.isSessionSupported('immersive-vr');
+      this.hud.setVr(ok, ok ? '' : 'No VR headset found by this browser');
+    } catch (e) {
+      this.hud.setVr(false, `VR check failed: ${(e as Error).message}`);
+    }
+  }
+
+  /**
+   * Must call requestSession synchronously inside the click: browsers only
+   * allow it with "transient user activation", which is gone by the time a
+   * camera prompt + model load finishes. The camera starts on sessionstart.
+   */
   private enterXR(): void {
-    const go = () => this.world.launchXR();
-    // Ask for the camera first, while we can still show a permission prompt.
-    if (this.hands.tracker.running) go();
-    else void this.hands.startCamera().catch(() => {}).finally(go);
+    if (!navigator.xr) {
+      this.hud.setVrMessage('This browser has no WebXR, so it cannot enter VR.');
+      return;
+    }
+    // IWSDK only console.error()s a failed request, so catch that to show it.
+    const origError = console.error;
+    let failure = '';
+    console.error = (...args: unknown[]) => {
+      if (typeof args[0] === 'string' && args[0].startsWith('[XR]')) failure = args.slice(1).map(String).join(' ') || args[0];
+      origError.apply(console, args);
+    };
+    this.hud.setVrMessage('Starting VR…');
+    try {
+      this.world.launchXR();
+    } catch (e) {
+      failure = (e as Error).message;
+    }
+    const started = performance.now();
+    const poll = () => {
+      if (this.world.sessionRequestPending && performance.now() - started < 30000) return void setTimeout(poll, 100);
+      console.error = origError;
+      if (this.world.session) this.hud.setVrMessage('');
+      else this.hud.setVrMessage(`Couldn't enter VR${failure ? `: ${failure}` : ''}`);
+    };
+    poll();
   }
 
   private buildScene(): void {

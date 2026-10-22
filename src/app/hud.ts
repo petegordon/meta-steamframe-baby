@@ -44,6 +44,7 @@ export class Hud {
         <button class="primary" data-id="cam">Start camera</button>
         <button class="primary vr" data-id="vr">Enter VR</button>
       </div>
+      <div class="status" data-id="vrmsg" hidden></div>
       <div class="status" data-id="status">Camera off</div>
       <div class="preview"></div>
       <label>Camera <select data-id="device"><option value="">Default camera</option></select></label>
@@ -110,6 +111,20 @@ export class Hud {
   setStatus(text: string, running: boolean): void {
     this.status.textContent = text;
     this.camBtn.textContent = running ? 'Stop camera' : 'Start camera';
+  }
+
+  /** Enable/disable the Enter VR button with a reason. */
+  setVr(supported: boolean, reason: string): void {
+    const btn = this.q<HTMLButtonElement>('vr');
+    btn.disabled = !supported;
+    btn.title = reason;
+    this.setVrMessage(supported ? '' : reason);
+  }
+
+  setVrMessage(text: string): void {
+    const el = this.q('vrmsg');
+    el.textContent = text;
+    el.hidden = !text;
   }
 
   setVisible(v: boolean): void {
