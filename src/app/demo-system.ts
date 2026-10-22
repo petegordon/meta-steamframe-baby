@@ -47,6 +47,7 @@ export class DemoSystem extends createSystem({
   private headPos = new Vector3();
   private headDir = new Vector3();
   private seen = { left: false, right: false };
+  private watchingDevices = false;
 
   init(): void {
     const world = this.world;
@@ -113,9 +114,14 @@ export class DemoSystem extends createSystem({
       this.hud.setVr(false, window.isSecureContext ? 'No WebXR in this browser' : 'VR needs https://');
       return;
     }
+    // Re-check when a headset connects or the runtime wakes up.
+    if (!this.watchingDevices) {
+      this.watchingDevices = true;
+      xr.addEventListener('devicechange', () => void this.checkXRSupport());
+    }
     try {
       const ok = await xr.isSessionSupported('immersive-vr');
-      this.hud.setVr(ok, ok ? '' : 'No VR headset found by this browser');
+      this.hud.setVr(ok, ok ? '' : 'Browser reports no VR headset');
     } catch (e) {
       this.hud.setVr(false, `VR check failed: ${(e as Error).message}`);
     }

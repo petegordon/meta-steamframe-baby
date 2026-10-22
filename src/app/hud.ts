@@ -39,6 +39,7 @@ export class Hud {
       <header>
         <h1>Camera Hands</h1>
         <p>Meta-style WebXR hand tracking from a camera, for headsets without it (Steam Frame).</p>
+        <div class="build" data-id="build"></div>
       </header>
       <div class="row">
         <button class="primary" data-id="cam">Start camera</button>
@@ -65,6 +66,10 @@ export class Hud {
     `;
     this.root.querySelector('.preview')!.append(previewCanvas);
     this.status = this.q('status');
+    const built = new Date(__BUILD_INFO__.time);
+    this.q('build').textContent = `build ${__BUILD_INFO__.commit} · ${built.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`;
+    this.q('build').title = __BUILD_INFO__.time;
+    console.info(`[camera-hands] build ${__BUILD_INFO__.commit} ${__BUILD_INFO__.time}`);
     this.camBtn = this.q('cam');
     this.camSelect = this.q('device');
 
@@ -113,12 +118,13 @@ export class Hud {
     this.camBtn.textContent = running ? 'Stop camera' : 'Start camera';
   }
 
-  /** Enable/disable the Enter VR button with a reason. */
+  /**
+   * Warn (but keep the button usable) when the browser says it can't do VR:
+   * some browsers report "unsupported" up front yet still start a session.
+   */
   setVr(supported: boolean, reason: string): void {
-    const btn = this.q<HTMLButtonElement>('vr');
-    btn.disabled = !supported;
-    btn.title = reason;
-    this.setVrMessage(supported ? '' : reason);
+    this.q<HTMLButtonElement>('vr').title = reason;
+    this.setVrMessage(supported ? '' : `${reason} (you can still try Enter VR)`);
   }
 
   setVrMessage(text: string): void {
