@@ -1,0 +1,21 @@
+; Frame Hands: native Steam Frame app (Godot 4 + OpenXR).
+; Hands come from the on-headset camera tracker (see ../README.md).
+
+config_version=5
+
+[application]
+
+config/name="Frame Hands"
+config/description="Camera hand tracking on Steam Frame: see your hands, point, make a fist to click/grab."
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.7", "Mobile")
+
+[rendering]
+
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
+
+[xr]
+
+openxr/enabled=true
+shaders/enabled=true

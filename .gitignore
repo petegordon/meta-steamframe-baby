@@ -11,3 +11,8 @@ dist/
 # Copied from node_modules by scripts/copy-mediapipe.mjs
 public/mediapipe/
 .tmp-*
+
+# Godot import cache / native build output
+native/godot/.godot/
+native/godot/build_info.json
+out/

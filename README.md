@@ -4,6 +4,8 @@ Meta-Quest-style **bare-hand tracking for WebXR on headsets that don't have it**
 
 Code written for Quest hand tracking therefore runs unchanged. That covers Meta's Immersive Web SDK ([IWSDK](https://iwsdk.dev)) hand visuals, pinch-grab and poke, and loops like the one in [sandquest-puzzle](https://github.com/petegordon/sandquest-puzzle)'s `hand-sand.ts`.
 
+> **Native version:** [`native/`](native/README.md) is a standalone Steam Frame app (Godot + OpenXR, no browser or PC). It uses the headset's cameras for hand tracking, and you point and make a fist to click or grab. Download the latest build from the [`native-latest` release](https://github.com/petegordon/meta-steamframe-baby/releases/tag/native-latest).
+
 ## Why
 
 On Steam Frame, WebXR runs in a community-patched Chromium. Its `XRHand` joints come from the **controllers' finger sensors**. Put the controllers down and the hands disappear, so pages that need bare hands don't work. This project fills that gap from the camera.

@@ -1,0 +1,58 @@
+name: Build native Frame app
+
+on:
+  push:
+    branches: [main]
+    paths: ['native/**', '.github/workflows/native.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: 4.7.2
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Godot and the Linux ARM64 export templates
+        run: |
+          base=https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable
+          curl -sSL -o godot.zip $base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip
+          unzip -q godot.zip && mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 godot
+          curl -sSL -o tpl.tpz $base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz
+          dest=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          mkdir -p $dest
+          unzip -q -j tpl.tpz 'templates/linux_*arm64*' 'templates/version.txt' -d $dest
+          ls -la $dest
+
+      - name: Export
+        run: |
+          echo "{\"commit\":\"${GITHUB_SHA::7}\",\"time\":\"$(date -u +%Y-%m-%dT%H:%MZ)\"}" > native/godot/build_info.json
+          mkdir -p out/frame-hands
+          cd native/godot
+          ../../godot --headless --import || true
+          ../../godot --headless --export-release "Linux ARM64" ../../out/frame-hands/frame-hands.arm64
+          cd ../..
+          test -s out/frame-hands/frame-hands.arm64
+          cp native/frame/run.sh native/tools/fake_hands.py native/README.md native/godot/build_info.json out/frame-hands/
+          chmod +x out/frame-hands/run.sh out/frame-hands/frame-hands.arm64
+          file out/frame-hands/frame-hands.arm64
+          cd out && zip -r frame-hands-linux-arm64.zip frame-hands
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frame-hands-linux-arm64
+          path: out/frame-hands-linux-arm64.zip
+
+      - name: Publish to the "native-latest" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view native-latest >/dev/null 2>&1 || \
+            gh release create native-latest --prerelease --title "Frame Hands (native Steam Frame app) - latest build" \
+              --notes "Built automatically from main. Install steps: native/README.md"
+          gh release upload native-latest out/frame-hands-linux-arm64.zip --clobber
+          gh release edit native-latest --notes "Built automatically from main at ${GITHUB_SHA::7}. Install steps: https://github.com/${GITHUB_REPOSITORY}/blob/main/native/README.md"
