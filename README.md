@@ -58,6 +58,17 @@ A floating panel shows the camera view, the detected landmarks and the tracking 
 
 URL overrides: `?rig=webcam|headset&mode=auto|replace|off&fov=100&latency=45&swap=0`.
 
+## Steam Frame: you need a WebXR-enabled browser
+
+Stock Chromium on the Frame (the Flathub app) exposes `navigator.xr` but can't start VR. `isSessionSupported('immersive-vr')` is false, and Enter VR fails with *NotSupportedError: The specified session configuration is not supported*. The cause is that upstream Chromium only builds its OpenXR backend for Windows and Android, so this happens on every WebXR site.
+
+Use a community Chromium build with OpenXR enabled, such as [saphid/chromium-webxr-steam-frame](https://github.com/saphid/chromium-webxr-steam-frame) ([notes](https://github.com/saphid/frame-control/blob/main/docs/webxr-chromium.md)):
+
+- Build it on an x86-64 Linux machine. It needs about 90 GB and several hours.
+- Install it on the Frame with `frame/install.sh`. That adds a "Chromium XR" Steam shortcut.
+- Launch it from that shortcut, and close any other Chromium first.
+- It runs with `--enable-features=OpenXR --disable-seccomp-filter-sandbox`, so use it for VR sites only.
+
 ## Known unknowns / next steps
 
 - **Camera access on Steam Frame is unverified.** Whether the Frame's cameras show up to `getUserMedia` in its browser depends on the browser build. If they don't, a native-side camera bridge would be needed. Community work (e.g. CadeXR) has shown local camera-based hand tracking on the Frame.

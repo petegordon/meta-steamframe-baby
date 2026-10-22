@@ -22,6 +22,12 @@ import { HandSkeleton } from './hand-skeleton.js';
 import { Hud } from './hud.js';
 
 const TABLE_Z = -0.55;
+
+/** Stock Linux Chromium (incl. Flathub on Steam Frame) ships without an OpenXR backend. */
+const NO_RUNTIME_HINT = (failure: string) =>
+  /NotSupported|not supported/i.test(failure) && /Linux/.test(navigator.userAgent)
+    ? ' — this Chromium has no VR runtime. On Steam Frame use a WebXR-enabled Chromium build (see the README).'
+    : '';
 const TABLE_H = 0.78;
 const PALETTE = [0xff6b6b, 0xffd93d, 0x6bcB77, 0x4d96ff, 0xc77dff];
 
@@ -155,7 +161,7 @@ export class DemoSystem extends createSystem({
       if (this.world.sessionRequestPending && performance.now() - started < 30000) return void setTimeout(poll, 100);
       console.error = origError;
       if (this.world.session) this.hud.setVrMessage('');
-      else this.hud.setVrMessage(`Couldn't enter VR${failure ? `: ${failure}` : ''}`);
+      else this.hud.setVrMessage(`Couldn't enter VR${failure ? `: ${failure}` : ''}${NO_RUNTIME_HINT(failure)}`);
     };
     poll();
   }
